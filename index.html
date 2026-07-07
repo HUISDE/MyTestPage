@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>商标翻译校对系统 · 任务领取</title>
+  <!-- 样式 -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ==================== 登录页 ==================== -->
+  <div class="login-page" id="loginPage">
+    <div class="login-card">
+      <div class="logo-area">
+        <div class="logo-icon">™</div>
+        <h1>商标翻译校对</h1>
+        <p class="subtitle">机器翻译 · 人工修正 · 任务领取</p>
+      </div>
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label for="loginUser">用户名</label>
+          <input type="text" id="loginUser" placeholder="请输入用户名" value="employee" />
+        </div>
+        <div class="form-group">
+          <label for="loginPass">密码</label>
+          <input type="password" id="loginPass" placeholder="请输入密码" value="123456" />
+        </div>
+        <button type="submit" class="btn-primary">登 录</button>
+        <div class="error-msg" id="loginError"></div>
+      </form>
+      <div class="demo-hint">
+        <strong>👤 演示账号</strong><br />
+        普通员工：<strong>employee</strong> / 123456 &nbsp;|&nbsp;
+        管理员：<strong>admin</strong> / 123456
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 主应用 ==================== -->
+  <div class="app-container" id="appContainer">
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+      <div class="nav-left">
+        <div class="nav-logo">™</div>
+        <div class="nav-title">商标翻译校对 <span>· 任务系统</span></div>
+      </div>
+      <div class="nav-right">
+        <div class="user-badge">
+          <span class="avatar" id="userAvatar">E</span>
+          <span id="userName">员工</span>
+          <span class="role-tag" id="userRoleTag">员工</span>
+        </div>
+        <button class="btn-logout" id="logoutBtn">退出</button>
+      </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 统计 -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">📊 总商标</div>
+            <div class="stat-number" id="statTotal">0</div>
+          </div>
+          <div class="stat-icon total">📋</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">⏳ 待修正</div>
+            <div class="stat-number" id="statPending">0</div>
+          </div>
+          <div class="stat-icon pending">🕐</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">✏️ 已修正</div>
+            <div class="stat-number" id="statCorrected">0</div>
+          </div>
+          <div class="stat-icon corrected">✅</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">✔️ 已审核</div>
+            <div class="stat-number" id="statReviewed">0</div>
+          </div>
+          <div class="stat-icon reviewed">🏅</div>
+        </div>
+      </div>
+
+      <!-- 任务领取面板（仅员工可见） -->
+      <div class="claim-panel" id="claimPanel" style="display:none;">
+        <div class="claim-info">
+          <span class="claim-label">📥 可领取任务</span>
+          <span class="claim-count" id="claimableCount">0</span>
+          <span class="claim-hint">未分配待修正任务，领取后自动锁定到您的名下</span>
+        </div>
+        <div class="claim-actions">
+          <input type="number" id="claimInput" value="1" min="1" max="99" />
+          <button class="btn-claim" id="claimBtn">
+            <span>领取任务</span>
+            <span class="badge" id="claimBadge">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 工具栏 -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索商标名称..." />
+          </div>
+          <select id="statusFilter">
+            <option value="all">全部状态</option>
+            <option value="pending">待修正</option>
+            <option value="corrected">已修正</option>
+            <option value="reviewed">已审核</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn-refresh" id="refreshBtn" title="刷新数据">⟳</button>
+        </div>
+      </div>
+
+      <!-- 表格 -->
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px;">#</th>
+                <th style="min-width:110px;">商标名称</th>
+                <th style="width:80px;">类别</th>
+                <th style="min-width:120px;">原文</th>
+                <th style="min-width:140px;">机器翻译</th>
+                <th style="min-width:140px;">修正译文</th>
+                <th style="width:100px;">状态</th>
+                <th style="min-width:110px;" id="assigneeHeader">受让人</th>
+                <th style="min-width:130px;">提交时间</th>
+                <th style="width:120px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- 动态渲染 -->
+            </tbody>
+          </table>
+        </div>
+        <!-- 分页 -->
+        <div class="pagination">
+          <span class="page-info" id="pageInfo">共 0 条</span>
+          <div class="page-btns" id="pageBtns">
+            <button id="prevPage" disabled>‹</button>
+            <span id="pageNumbers"></span>
+            <button id="nextPage" disabled>›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 编辑模态框 ==================== -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>✏️ 修正译文</h2>
+        <button class="modal-close" id="modalClose">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-row">
+          <span class="label">商标</span>
+          <span class="value" id="modalBrandName">—</span>
+        </div>
+        <div class="info-row">
+          <span class="label">原文</span>
+          <span class="value" id="modalSourceText">—</span>
+        </div>
+        <div class="info-row">
+          <span class="label">机器翻译</span>
+          <span class="value mt" id="modalMachineTrans">—</span>
+        </div>
+        <div class="form-group">
+          <label for="modalCorrectedInput">人工修正译文</label>
+          <textarea id="modalCorrectedInput" placeholder="请输入修正后的译文…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalCancel">取消</button>
+        <button class="btn btn-primary" id="modalSave">💾 保存修正</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== Toast容器 ==================== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ==================== JavaScript 模块 ==================== -->
+  <!-- 加载顺序：配置 → 工具库 → API 层 → 主应用逻辑 -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
