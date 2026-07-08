@@ -25,6 +25,34 @@ const Toolbar = (() => {
     bindEvents();
   }
 
+  /**
+   * 按角色配置状态筛选项。
+   * - 译员：可筛选自己的待修正/待审核/已审核/已驳回
+   * - 审核员：不显示待修正；仅处理待审核和自己已处理记录
+   */
+  function setUserRole(role) {
+    const statusFilter = document.getElementById('statusFilter');
+    if (!statusFilter) return;
+
+    const options = role === 'reviewer'
+      ? [
+        { value: 'all', label: '全部可审核' },
+        { value: 'corrected', label: '待审核' },
+        { value: 'reviewed', label: '我已通过' },
+        { value: 'rejected', label: '我已驳回' }
+      ]
+      : [
+        { value: 'all', label: '全部状态' },
+        { value: 'pending', label: '待修正' },
+        { value: 'corrected', label: '待审核' },
+        { value: 'reviewed', label: '已审核' },
+        { value: 'rejected', label: '已驳回' }
+      ];
+
+    statusFilter.innerHTML = options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+    statusFilter.value = 'all';
+  }
+
   function bindEvents() {
     // 搜索（300ms 防抖）
     const searchInput = document.getElementById('searchInput');
@@ -95,5 +123,5 @@ const Toolbar = (() => {
     };
   }
 
-  return { init, getSearch, getStatus, getSortParams };
+  return { init, setUserRole, getSearch, getStatus, getSortParams };
 })();

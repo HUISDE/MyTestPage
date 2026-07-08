@@ -50,6 +50,7 @@ function applyUserToComponents() {
   if (!currentUser) return;
   DataTable.setUser(currentUser);
   EditModal.setUser(currentUser);
+  Toolbar.setUserRole(currentUser.role);
 
   // 仅译员可见任务领取面板
   if (currentUser.role === 'employee') {

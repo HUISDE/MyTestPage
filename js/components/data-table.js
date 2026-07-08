@@ -44,11 +44,11 @@ const DataTable = (() => {
 
     const isReviewer = currentUser && currentUser.role === 'reviewer';
     const isEmployee = currentUser && currentUser.role === 'employee';
-    // 审核员隐藏受让人列
-    document.getElementById('assigneeHeader').style.display = isReviewer ? 'none' : 'table-cell';
+    // 译员只看自己的任务，不需要显示受让人；审核员需要看到受让人
+    document.getElementById('assigneeHeader').style.display = isEmployee ? 'none' : 'table-cell';
 
     const tbody = document.getElementById('tableBody');
-    const colSpan = isReviewer ? 6 : 7;
+    const colSpan = isEmployee ? 6 : 7;
 
     if (!items || items.length === 0) {
       tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><div class="empty-icon">📭</div><p>暂无匹配的商标数据</p></div></td></tr>`;
@@ -58,16 +58,18 @@ const DataTable = (() => {
         const statusTitle = CONFIG.STATUS_LABEL[item.status] || item.status;
         const isPendingOrRejected = item.status === 'pending' || item.status === 'rejected';
         const isCorrected = item.status === 'corrected';
+        const isHandledByReviewer = isReviewer && item.reviewedBy === currentUser?.username;
 
-        // 编辑权限：译员可编辑 pending/rejected 且未分配或分配给自己
+        // 编辑权限：译员只能编辑自己领取的 pending/rejected 任务
         const canEdit = isEmployee && (isPendingOrRejected || isCorrected) &&
-          (!item.assignedTo || item.assignedTo === currentUser?.username);
+          item.assignedTo === currentUser?.username;
 
         // 审核权限：审核员可审核 corrected 状态
         const canReview = isReviewer && isCorrected;
 
-        // 查看权限：审核员可查看所有，译员可查看自己的
-        const canView = isReviewer || (isEmployee && item.assignedTo === currentUser?.username);
+        // 查看权限：审核员只查看待审核和自己处理过的记录；译员只查看自己的
+        const canView = (isReviewer && (isCorrected || isHandledByReviewer)) ||
+          (isEmployee && item.assignedTo === currentUser?.username);
 
         const correctedDisplay = item.correctedTranslation || '';
         const correctedClass = correctedDisplay ? '' : 'empty';
@@ -75,7 +77,9 @@ const DataTable = (() => {
 
         let actionHtml = '';
         if (isReviewer) {
-          actionHtml = `<button class="btn-icon edit" data-id="${item.id}" title="查看详情">📋</button>`;
+          if (canView) {
+            actionHtml = `<button class="btn-icon edit" data-id="${item.id}" title="查看详情">📋</button>`;
+          }
           if (canReview) {
             actionHtml += `<button class="btn-icon review" data-id="${item.id}" title="审核通过">✅</button>`;
           }
@@ -90,8 +94,8 @@ const DataTable = (() => {
 
         if (!actionHtml) actionHtml = '<span style="color:#cbd5e1;">—</span>';
 
-        // 审核员隐藏受让人列
-        const assigneeCell = isReviewer ? '' : `<td>${item.assignedTo ? `<span class="assignee-tag">${escapeHtml(item.assignedTo)}</span>` : `<span class="assignee-tag unassigned">—</span>`}</td>`;
+        // 译员隐藏受让人列，审核员显示受让人
+        const assigneeCell = isEmployee ? '' : `<td>${item.assignedTo ? `<span class="assignee-tag">${escapeHtml(item.assignedTo)}</span>` : `<span class="assignee-tag unassigned">—</span>`}</td>`;
 
         return `
           <tr>

@@ -70,7 +70,8 @@ const ClaimPanel = (() => {
   async function handleClaim(count) {
     try {
       const result = await API.claimTasks(count);
-      Toast.show(`✅ ${result.message}`, 'success');
+      const claimedCount = result.claimedCount ?? 0;
+      Toast.show(`成功领取 ${claimedCount} 个任务`, 'success');
       if (onClaimCallback) onClaimCallback();
     } catch (err) {
       Toast.show(err.message, 'error');
