@@ -1,0 +1,46 @@
+/* ==============================================
+   Responsive · 响应式适配
+   ============================================== */
+
+/* ----- 1024px 以下：平板 ----- */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .main-content { padding: 20px 16px; }
+  .top-nav { padding: 0 16px; }
+}
+
+/* ----- 768px 以下：大屏手机 ----- */
+@media (max-width: 768px) {
+  .modal-box { padding: 24px 24px; }
+}
+
+/* ----- 640px 以下：手机 ----- */
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-card { padding: 16px; }
+  .stat-card .stat-info .stat-number { font-size: 24px; }
+
+  .claim-panel { flex-direction: column; align-items: stretch; }
+  .claim-panel .claim-info { justify-content: center; }
+  .claim-panel .claim-actions { justify-content: center; }
+
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar .toolbar-left,
+  .toolbar .toolbar-right { width: 100%; }
+  .toolbar .search-box input { width: 100%; }
+
+  .top-nav .nav-title span { display: none; }
+  .login-card { padding: 32px 24px; }
+  .modal-box { padding: 24px 20px; }
+  .pagination { flex-direction: column; align-items: center; }
+}
+
+/* ----- 480px 以下：小屏手机 ----- */
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card .stat-info .stat-number { font-size: 20px; }
+  .stat-card .stat-icon { font-size: 28px; }
+
+  .top-nav .user-badge .role-tag { display: none; }
+  .claim-panel .claim-info .claim-count { font-size: 18px; line-height: 36px; min-width: 48px; }
+}

@@ -4,40 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>商标翻译校对系统 · 任务领取</title>
-  <!-- 样式 -->
-  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- 样式（按依赖顺序加载） -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/login.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
 </head>
 <body>
 
-  <!-- ==================== 登录页 ==================== -->
+  <!-- ==================== 登录页容器 ==================== -->
   <div class="login-page" id="loginPage">
-    <div class="login-card">
-      <div class="logo-area">
-        <div class="logo-icon">™</div>
-        <h1>商标翻译校对</h1>
-        <p class="subtitle">机器翻译 · 人工修正 · 任务领取</p>
-      </div>
-      <form id="loginForm" autocomplete="off">
-        <div class="form-group">
-          <label for="loginUser">用户名</label>
-          <input type="text" id="loginUser" placeholder="请输入用户名" value="employee" />
-        </div>
-        <div class="form-group">
-          <label for="loginPass">密码</label>
-          <input type="password" id="loginPass" placeholder="请输入密码" value="123456" />
-        </div>
-        <button type="submit" class="btn-primary">登 录</button>
-        <div class="error-msg" id="loginError"></div>
-      </form>
-      <div class="demo-hint">
-        <strong>👤 演示账号</strong><br />
-        普通员工：<strong>employee</strong> / 123456 &nbsp;|&nbsp;
-        管理员：<strong>admin</strong> / 123456
-      </div>
-    </div>
+    <!-- 由 LoginPage 组件动态渲染 -->
   </div>
 
-  <!-- ==================== 主应用 ==================== -->
+  <!-- ==================== 主应用容器 ==================== -->
   <div class="app-container" id="appContainer">
     <!-- 顶部导航 -->
     <nav class="top-nav">
@@ -57,7 +39,7 @@
 
     <!-- 主内容 -->
     <div class="main-content">
-      <!-- 统计 -->
+      <!-- 统计卡片 -->
       <div class="stats-grid" id="statsGrid">
         <div class="stat-card">
           <div class="stat-info">
@@ -89,7 +71,7 @@
         </div>
       </div>
 
-      <!-- 任务领取面板（仅员工可见） -->
+      <!-- 任务领取面板 -->
       <div class="claim-panel" id="claimPanel" style="display:none;">
         <div class="claim-info">
           <span class="claim-label">📥 可领取任务</span>
@@ -124,7 +106,7 @@
         </div>
       </div>
 
-      <!-- 表格 -->
+      <!-- 数据表格 -->
       <div class="table-wrap">
         <div class="table-scroll">
           <table>
@@ -143,11 +125,10 @@
               </tr>
             </thead>
             <tbody id="tableBody">
-              <!-- 动态渲染 -->
+              <!-- 由 DataTable 组件动态渲染 -->
             </tbody>
           </table>
         </div>
-        <!-- 分页 -->
         <div class="pagination">
           <span class="page-info" id="pageInfo">共 0 条</span>
           <div class="page-btns" id="pageBtns">
@@ -196,10 +177,26 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- ==================== JavaScript 模块 ==================== -->
-  <!-- 加载顺序：配置 → 工具库 → API 层 → 主应用逻辑 -->
+  <!--
+    加载顺序：
+    1. 核心层：config → utils（向后兼容）→ api
+    2. 组件层：独立组件，按需加载
+    3. 主入口：app
+  -->
   <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/api.js"></script>
+
+  <!-- 组件 -->
+  <script src="js/components/toast.js"></script>
+  <script src="js/components/login-page.js"></script>
+  <script src="js/components/stats-grid.js"></script>
+  <script src="js/components/claim-panel.js"></script>
+  <script src="js/components/toolbar.js"></script>
+  <script src="js/components/data-table.js"></script>
+  <script src="js/components/edit-modal.js"></script>
+
+  <!-- 主入口 -->
   <script src="js/app.js"></script>
 </body>
 </html>
