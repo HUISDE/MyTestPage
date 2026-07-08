@@ -72,8 +72,8 @@ const API = (() => {
     },
 
     // === 商标数据 ===
-    async getTrademarks(page = 1, pageSize = 10, search = '', status = 'all') {
-      const params = new URLSearchParams({ page, pageSize, search, status });
+    async getTrademarks(page = 1, pageSize = 10, search = '', status = 'all', sortBy = 'id', sortOrder = 'ASC') {
+      const params = new URLSearchParams({ page, pageSize, search, status, sortBy, sortOrder });
       return await request('GET', `/trademarks?${params}`);
     },
 
@@ -91,6 +91,10 @@ const API = (() => {
 
     async reviewTrademark(id) {
       return await request('PUT', `/trademarks/${id}/review`);
+    },
+
+    async rejectTrademark(id, comment) {
+      return await request('PUT', `/trademarks/${id}/reject`, { comment: comment || '' });
     },
 
     // === 任务领取 ===

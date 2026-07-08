@@ -36,8 +36,9 @@ const LoginPage = (() => {
         </form>
         <div class="demo-hint">
           <strong>👤 演示账号</strong><br />
-          普通员工：<strong>employee</strong> / 123456 &nbsp;|&nbsp;
-          管理员：<strong>admin</strong> / 123456
+          译员：<strong>employee</strong> / 123456 &nbsp;|&nbsp;
+          审核员：<strong>admin</strong> / 123456 &nbsp;|&nbsp;
+          审核员2：<strong>reviewer2</strong> / 123456
         </div>
       </div>
     `;

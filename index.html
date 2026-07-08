@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>商标翻译校对系统 · 任务领取</title>
-
-  <!-- 样式（按依赖顺序加载） -->
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/login.css" />
   <link rel="stylesheet" href="css/layout.css" />
@@ -13,15 +11,9 @@
   <link rel="stylesheet" href="css/responsive.css" />
 </head>
 <body>
+  <div class="login-page" id="loginPage"></div>
 
-  <!-- ==================== 登录页容器 ==================== -->
-  <div class="login-page" id="loginPage">
-    <!-- 由 LoginPage 组件动态渲染 -->
-  </div>
-
-  <!-- ==================== 主应用容器 ==================== -->
   <div class="app-container" id="appContainer">
-    <!-- 顶部导航 -->
     <nav class="top-nav">
       <div class="nav-left">
         <div class="nav-logo">™</div>
@@ -37,111 +29,143 @@
       </div>
     </nav>
 
-    <!-- 主内容 -->
     <div class="main-content">
-      <!-- 统计卡片 -->
-      <div class="stats-grid" id="statsGrid">
-        <div class="stat-card">
-          <div class="stat-info">
-            <div class="stat-label">📊 总商标</div>
-            <div class="stat-number" id="statTotal">0</div>
+      <div class="tab-nav" id="tabNav">
+        <button class="tab-btn active" data-tab="tab-overview">
+          <span class="tab-icon">📊</span> 任务概览
+        </button>
+        <button class="tab-btn" data-tab="tab-workspace">
+          <span class="tab-icon">📝</span> 工作区
+        </button>
+      </div>
+
+      <!-- ===== Tab: 任务概览 ===== -->
+      <div class="tab-panel active" id="tab-overview">
+        <!-- 译员专属卡片 (employee) -->
+        <div class="stats-grid" id="statsEmployee" style="display:none;">
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">⏳ 待修正</div><div class="stat-number" id="statPending">0</div></div>
+            <div class="stat-icon pending">🕐</div>
           </div>
-          <div class="stat-icon total">📋</div>
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">📝 已修正</div><div class="stat-number" id="statCorrected">0</div></div>
+            <div class="stat-icon corrected">✅</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">✔️ 已审核</div><div class="stat-number" id="statReviewed">0</div></div>
+            <div class="stat-icon reviewed">🏅</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">↩️ 已驳回</div><div class="stat-number" id="statRejected">0</div></div>
+            <div class="stat-icon rejected">↩️</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">📊 总计</div><div class="stat-number" id="statTotalEmp">0</div></div>
+            <div class="stat-icon total">📋</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-info">
-            <div class="stat-label">⏳ 待修正</div>
-            <div class="stat-number" id="statPending">0</div>
+
+        <!-- 审核员专属卡片 (reviewer) -->
+        <div class="stats-grid" id="statsReviewer" style="display:none;">
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">📝 待审核</div><div class="stat-number" id="rvToReview">0</div></div>
+            <div class="stat-icon corrected">📝</div>
           </div>
-          <div class="stat-icon pending">🕐</div>
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">✅ 已通过</div><div class="stat-number" id="rvApproved">0</div></div>
+            <div class="stat-icon reviewed">✅</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">↩️ 已驳回</div><div class="stat-number" id="rvRejected">0</div></div>
+            <div class="stat-icon rejected">↩️</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info"><div class="stat-label">📊 总商标</div><div class="stat-number" id="rvTotal">0</div></div>
+            <div class="stat-icon total">📋</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-info">
-            <div class="stat-label">✏️ 已修正</div>
-            <div class="stat-number" id="statCorrected">0</div>
+
+        <!-- 任务领取面板 (仅译员) -->
+        <div class="claim-panel" id="claimPanel" style="display:none;">
+          <div class="claim-info">
+            <span class="claim-label">📥 可领取任务</span>
+            <span class="claim-count" id="claimableCount">0</span>
+            <span class="claim-hint">未分配待修正任务，领取后自动锁定到您的名下</span>
           </div>
-          <div class="stat-icon corrected">✅</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-info">
-            <div class="stat-label">✔️ 已审核</div>
-            <div class="stat-number" id="statReviewed">0</div>
+          <div class="claim-actions">
+            <input type="number" id="claimInput" value="1" min="1" max="99" />
+            <button class="btn-claim" id="claimBtn"><span>领取任务</span><span class="badge" id="claimBadge">0</span></button>
           </div>
-          <div class="stat-icon reviewed">🏅</div>
         </div>
       </div>
 
-      <!-- 任务领取面板 -->
-      <div class="claim-panel" id="claimPanel" style="display:none;">
-        <div class="claim-info">
-          <span class="claim-label">📥 可领取任务</span>
-          <span class="claim-count" id="claimableCount">0</span>
-          <span class="claim-hint">未分配待修正任务，领取后自动锁定到您的名下</span>
-        </div>
-        <div class="claim-actions">
-          <input type="number" id="claimInput" value="1" min="1" max="99" />
-          <button class="btn-claim" id="claimBtn">
-            <span>领取任务</span>
-            <span class="badge" id="claimBadge">0</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- 工具栏 -->
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="搜索商标名称..." />
+      <!-- ===== Tab: 工作区 ===== -->
+      <div class="tab-panel" id="tab-workspace">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchInput" placeholder="搜索原文内容..." />
+            </div>
+            <select id="statusFilter">
+              <option value="all">全部状态</option>
+              <option value="pending">待修正</option>
+              <option value="corrected">已修正</option>
+              <option value="reviewed">已审核</option>
+              <option value="rejected">已驳回</option>
+            </select>
+            <div class="sort-group">
+              <span class="sort-label">排序</span>
+              <select id="sortBy">
+                <option value="id">默认(ID)</option>
+                <option value="assigned_at">领取时间</option>
+                <option value="corrected_at">修正时间</option>
+                <option value="reviewed_at">审核时间</option>
+              </select>
+              <select id="sortOrder">
+                <option value="ASC">升序</option>
+                <option value="DESC">降序</option>
+              </select>
+            </div>
           </div>
-          <select id="statusFilter">
-            <option value="all">全部状态</option>
-            <option value="pending">待修正</option>
-            <option value="corrected">已修正</option>
-            <option value="reviewed">已审核</option>
-          </select>
+          <div class="toolbar-right">
+            <button class="btn-refresh" id="refreshBtn" title="刷新数据">⟳</button>
+          </div>
         </div>
-        <div class="toolbar-right">
-          <button class="btn-refresh" id="refreshBtn" title="刷新数据">⟳</button>
-        </div>
-      </div>
 
-      <!-- 数据表格 -->
-      <div class="table-wrap">
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:50px;">#</th>
-                <th style="min-width:110px;">商标名称</th>
-                <th style="width:80px;">类别</th>
-                <th style="min-width:120px;">原文</th>
-                <th style="min-width:140px;">机器翻译</th>
-                <th style="min-width:140px;">修正译文</th>
-                <th style="width:100px;">状态</th>
-                <th style="min-width:110px;" id="assigneeHeader">受让人</th>
-                <th style="min-width:130px;">提交时间</th>
-                <th style="width:120px;">操作</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody">
-              <!-- 由 DataTable 组件动态渲染 -->
-            </tbody>
-          </table>
-        </div>
-        <div class="pagination">
-          <span class="page-info" id="pageInfo">共 0 条</span>
-          <div class="page-btns" id="pageBtns">
-            <button id="prevPage" disabled>‹</button>
-            <span id="pageNumbers"></span>
-            <button id="nextPage" disabled>›</button>
+        <div class="table-wrap">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="min-width:120px;">原文(source_text)</th>
+                  <th style="min-width:140px;">机器翻译</th>
+                  <th style="min-width:140px;">修正译文</th>
+                  <th style="min-width:90px;">领域</th>
+                  <th style="width:60px;">状态</th>
+                  <th style="min-width:100px;" id="assigneeHeader">受让人</th>
+                  <th style="width:100px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+          <div class="status-legend">
+            <span>⏳ 待修正</span><span>📝 已修正</span><span>✅ 已审核</span><span>↩️ 已驳回</span>
+          </div>
+          <div class="pagination">
+            <span class="page-info" id="pageInfo">共 0 条</span>
+            <div class="page-btns" id="pageBtns">
+              <button id="prevPage" disabled>‹</button>
+              <span id="pageNumbers"></span>
+              <button id="nextPage" disabled>›</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ==================== 编辑模态框 ==================== -->
   <div class="modal-overlay" id="editModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -149,21 +173,15 @@
         <button class="modal-close" id="modalClose">×</button>
       </div>
       <div class="modal-body">
-        <div class="info-row">
-          <span class="label">商标</span>
-          <span class="value" id="modalBrandName">—</span>
-        </div>
-        <div class="info-row">
-          <span class="label">原文</span>
-          <span class="value" id="modalSourceText">—</span>
-        </div>
-        <div class="info-row">
-          <span class="label">机器翻译</span>
-          <span class="value mt" id="modalMachineTrans">—</span>
-        </div>
-        <div class="form-group">
-          <label for="modalCorrectedInput">人工修正译文</label>
-          <textarea id="modalCorrectedInput" placeholder="请输入修正后的译文…"></textarea>
+        <div class="info-row"><span class="label">原文</span><span class="value" id="modalSourceText">—</span></div>
+        <div class="info-row"><span class="label">类别</span><span class="value" id="modalClass">—</span></div>
+        <div class="info-row"><span class="label">机器翻译</span><span class="value mt" id="modalMachineTrans">—</span></div>
+        <div class="match-highlight" id="modalMatchBlock" style="display:none;"><div class="match-label">🔗 高度匹配结果</div><div id="modalMatchText"></div></div>
+        <div class="ref-section" id="modalRefSection" style="display:none;"><div class="ref-title">📚 翻译参考</div><div id="modalRefList"></div></div>
+        <div class="form-group"><label for="modalCorrectedInput">人工修正译文</label><textarea id="modalCorrectedInput" placeholder="请输入修正后的译文…"></textarea></div>
+        <div class="form-group" id="rejectCommentGroup" style="display:none;">
+          <label for="modalRejectComment">驳回意见（可选）</label>
+          <textarea id="modalRejectComment" placeholder="请输入驳回原因…" style="min-height:60px;border-color:#f59e0b;"></textarea>
         </div>
       </div>
       <div class="modal-footer">
@@ -173,21 +191,11 @@
     </div>
   </div>
 
-  <!-- ==================== Toast容器 ==================== -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ==================== JavaScript 模块 ==================== -->
-  <!--
-    加载顺序：
-    1. 核心层：config → utils（向后兼容）→ api
-    2. 组件层：独立组件，按需加载
-    3. 主入口：app
-  -->
   <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/api.js"></script>
-
-  <!-- 组件 -->
   <script src="js/components/toast.js"></script>
   <script src="js/components/login-page.js"></script>
   <script src="js/components/stats-grid.js"></script>
@@ -195,8 +203,6 @@
   <script src="js/components/toolbar.js"></script>
   <script src="js/components/data-table.js"></script>
   <script src="js/components/edit-modal.js"></script>
-
-  <!-- 主入口 -->
   <script src="js/app.js"></script>
 </body>
 </html>

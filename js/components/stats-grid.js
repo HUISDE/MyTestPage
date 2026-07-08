@@ -1,29 +1,42 @@
 /**
  * 统计卡片组件
- * 渲染顶部4个统计数字卡片
- * 依赖：无（纯渲染）
+ * 支持译员和审核员双套卡片
  */
 const StatsGrid = (() => {
   /**
-   * @param {object} stats - { total, pending, corrected, reviewed, claimable }
+   * @param {object} stats - API stats 返回
+   * @param {string} role - 当前角色
    */
-  function render(stats) {
-    document.getElementById('statTotal').textContent = stats.total;
-    document.getElementById('statPending').textContent = stats.pending;
-    document.getElementById('statCorrected').textContent = stats.corrected;
-    document.getElementById('statReviewed').textContent = stats.reviewed;
+  function render(stats, role) {
+    const empGrid = document.getElementById('statsEmployee');
+    const rvGrid = document.getElementById('statsReviewer');
 
-    // 可领取数量（供 ClaimPanel 使用）
-    if (stats.claimable !== undefined) {
-      document.getElementById('claimableCount').textContent = stats.claimable;
+    if (role === 'reviewer') {
+      // 审核员卡片
+      if (empGrid) empGrid.style.display = 'none';
+      if (rvGrid) rvGrid.style.display = 'grid';
+      document.getElementById('rvToReview').textContent = stats.toReview ?? 0;
+      document.getElementById('rvApproved').textContent = stats.approvedByMe ?? 0;
+      document.getElementById('rvRejected').textContent = stats.rejectedByMe ?? 0;
+      document.getElementById('rvTotal').textContent = stats.total ?? 0;
+    } else {
+      // 译员卡片
+      if (rvGrid) rvGrid.style.display = 'none';
+      if (empGrid) empGrid.style.display = 'grid';
+      document.getElementById('statPending').textContent = stats.pending ?? 0;
+      document.getElementById('statCorrected').textContent = stats.corrected ?? 0;
+      document.getElementById('statReviewed').textContent = stats.reviewed ?? 0;
+      document.getElementById('statRejected').textContent = stats.rejected ?? 0;
+      document.getElementById('statTotalEmp').textContent = stats.total ?? 0;
+
+      // 可领取数量
+      if (stats.claimable !== undefined) {
+        const el = document.getElementById('claimableCount');
+        if (el) el.textContent = stats.claimable;
+      }
     }
     return stats;
   }
 
-  /** 仅更新可领取数量 */
-  function updateClaimable(count) {
-    document.getElementById('claimableCount').textContent = count;
-  }
-
-  return { render, updateClaimable };
+  return { render };
 })();

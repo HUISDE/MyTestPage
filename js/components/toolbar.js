@@ -1,11 +1,12 @@
 /**
  * 工具栏组件
- * 搜索框 + 状态筛选 + 刷新按钮
+ * 搜索框 + 状态筛选 + 排序 + 刷新按钮
  * 依赖：Toast
  */
 const Toolbar = (() => {
   let onSearchCallback = null;
   let onFilterCallback = null;
+  let onSortCallback = null;
   let onRefreshCallback = null;
   let searchTimer = null;
 
@@ -13,11 +14,13 @@ const Toolbar = (() => {
    * @param {object} callbacks
    * @param {function} callbacks.onSearch - 搜索文本变化
    * @param {function} callbacks.onFilter - 状态筛选变化
+   * @param {function} callbacks.onSort - 排序参数变化 ({ sortBy, sortOrder })
    * @param {function} callbacks.onRefresh - 点击刷新
    */
   function init(callbacks) {
     onSearchCallback = callbacks.onSearch;
     onFilterCallback = callbacks.onFilter;
+    onSortCallback = callbacks.onSort;
     onRefreshCallback = callbacks.onRefresh;
     bindEvents();
   }
@@ -39,6 +42,22 @@ const Toolbar = (() => {
     if (statusFilter) {
       statusFilter.addEventListener('change', () => {
         if (onFilterCallback) onFilterCallback();
+      });
+    }
+
+    // 排序字段
+    const sortBy = document.getElementById('sortBy');
+    if (sortBy) {
+      sortBy.addEventListener('change', () => {
+        if (onSortCallback) onSortCallback(getSortParams());
+      });
+    }
+
+    // 排序方向
+    const sortOrder = document.getElementById('sortOrder');
+    if (sortOrder) {
+      sortOrder.addEventListener('change', () => {
+        if (onSortCallback) onSortCallback(getSortParams());
       });
     }
 
@@ -66,5 +85,15 @@ const Toolbar = (() => {
     return el ? el.value : 'all';
   }
 
-  return { init, getSearch, getStatus };
+  /** 获取当前排序参数 */
+  function getSortParams() {
+    const sortBy = document.getElementById('sortBy');
+    const sortOrder = document.getElementById('sortOrder');
+    return {
+      sortBy: sortBy ? sortBy.value : 'id',
+      sortOrder: sortOrder ? sortOrder.value : 'ASC'
+    };
+  }
+
+  return { init, getSearch, getStatus, getSortParams };
 })();
