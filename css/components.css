@@ -1,60 +1,7 @@
 /* ==============================================
    Components · 组件样式
-   统计卡片 / 任务领取 / Tab导航 / 工具栏 / 表格 / 分页 / 模态框 / Toast / 空状态
+   统计卡片 / 任务领取 / 工具栏 / 表格 / 分页 / 模态框 / Toast / 空状态
    ============================================== */
-
-/* ===== Tab 导航 ===== */
-.tab-nav {
-  display: flex;
-  gap: 0;
-  margin-bottom: 24px;
-  background: var(--color-bg-white);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
-  padding: 4px;
-  box-shadow: var(--shadow-xs);
-}
-
-.tab-nav .tab-btn {
-  flex: 1;
-  padding: 12px 24px;
-  border: none;
-  background: transparent;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.tab-nav .tab-btn:hover {
-  color: var(--color-text-secondary);
-  background: var(--color-bg);
-}
-
-.tab-nav .tab-btn.active {
-  background: var(--color-primary);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
-}
-
-.tab-nav .tab-btn .tab-icon {
-  font-size: 18px;
-}
-
-/* Tab 内容面板 */
-.tab-panel {
-  display: none;
-}
-
-.tab-panel.active {
-  display: block;
-}
 
 /* ===== 统计卡片 ===== */
 .stats-grid {
@@ -100,11 +47,25 @@
   opacity: 0.8;
 }
 
-.stat-card .stat-icon.imported  { color: var(--color-purple); }
-.stat-card .stat-icon.pending   { color: var(--color-warning); }
-.stat-card .stat-icon.corrected { color: var(--color-primary); }
-.stat-card .stat-icon.reviewed  { color: var(--color-success); }
-.stat-card .stat-icon.total     { color: var(--color-text-secondary); }
+.stat-card .stat-icon.imported {
+  color: var(--color-purple);
+}
+
+.stat-card .stat-icon.pending {
+  color: var(--color-warning);
+}
+
+.stat-card .stat-icon.corrected {
+  color: var(--color-primary);
+}
+
+.stat-card .stat-icon.reviewed {
+  color: var(--color-success);
+}
+
+.stat-card .stat-icon.total {
+  color: var(--color-text-secondary);
+}
 
 /* ===== 任务领取面板 ===== */
 .claim-panel {
@@ -145,11 +106,6 @@
   line-height: 44px;
   min-width: 60px;
   text-align: center;
-}
-
-.claim-panel .claim-info .claim-hint {
-  color: var(--color-text-muted);
-  font-size: 14px;
 }
 
 .claim-panel .claim-actions {
@@ -307,6 +263,12 @@
   background: var(--color-border);
 }
 
+.assign-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* ===== 排序控件 ===== */
 .sort-group {
   display: flex;
@@ -346,6 +308,8 @@
 
 .table-scroll {
   overflow-x: auto;
+  max-height: 520px;
+  overflow-y: auto;
 }
 
 table {
@@ -397,24 +361,6 @@ table tbody tr:last-child td {
 
 .status-icon-cell[title]:hover {
   cursor: help;
-}
-
-/* ---- 状态图例行（表头下方说明行） ---- */
-.status-legend {
-  padding: 8px 24px;
-  font-size: 12px;
-  color: var(--color-text-placeholder);
-  border-bottom: 1px solid var(--color-border-light);
-  background: var(--color-bg-highlight);
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.status-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
 
 /* ===== 排序表头 ===== */
@@ -706,13 +652,15 @@ th.sortable.sorted .sort-arrow {
   line-height: 1.6;
 }
 
-/* ---- 参考信息区块 ---- */
+/* ---- 参考信息区块（含审核日志） ---- */
 .modal-box .ref-section {
   margin-top: 16px;
   padding: 16px;
   background: var(--color-bg);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border-light);
+  max-height: 260px;
+  overflow-y: auto;
 }
 
 .modal-box .ref-section .ref-title {
@@ -872,6 +820,41 @@ th.sortable.sorted .sort-arrow {
   background: var(--color-success-hover);
 }
 
+.confirm-box {
+  max-width: 420px;
+  text-align: center;
+}
+
+.confirm-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dcfce7;
+  color: var(--color-success);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.confirm-box h2 {
+  color: var(--color-text);
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.confirm-box p {
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.confirm-footer {
+  justify-content: center;
+  margin-top: 24px;
+}
+
 /* ===== Toast 提示 ===== */
 .toast-container {
   position: fixed;
@@ -898,10 +881,21 @@ th.sortable.sorted .sort-arrow {
   gap: 10px;
 }
 
-.toast.success { background: var(--color-success); }
-.toast.error   { background: var(--color-danger); }
-.toast.info    { background: var(--color-primary); }
-.toast.warning { background: var(--color-warning); }
+.toast.success {
+  background: var(--color-success);
+}
+
+.toast.error {
+  background: var(--color-danger);
+}
+
+.toast.info {
+  background: var(--color-primary);
+}
+
+.toast.warning {
+  background: var(--color-warning);
+}
 
 .toast .toast-close {
   background: none;
@@ -913,7 +907,9 @@ th.sortable.sorted .sort-arrow {
   padding: 0 4px;
 }
 
-.toast .toast-close:hover { color: #fff; }
+.toast .toast-close:hover {
+  color: #fff;
+}
 
 /* ===== 空状态 ===== */
 .empty-state {
@@ -929,4 +925,163 @@ th.sortable.sorted .sort-arrow {
 
 .empty-state p {
   font-size: 15px;
+}
+
+/* ===== 管理后台 ===== */
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.1fr) minmax(320px, 0.9fr);
+  gap: 20px;
+}
+
+.admin-card {
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  padding: 20px 24px;
+}
+
+.admin-card .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-form input,
+.admin-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-input);
+  color: var(--color-text);
+  outline: none;
+}
+
+.admin-form input:focus,
+.admin-form select:focus {
+  border-color: var(--color-primary);
+}
+
+.admin-form .language-picker,
+.admin-form .btn {
+  grid-column: 1 / -1;
+}
+
+.language-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  background: var(--color-bg);
+  border-radius: 10px;
+}
+
+.language-picker label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.worker-stats {
+  display: grid;
+  gap: 10px;
+}
+
+.worker-card {
+  padding: 12px 14px;
+  border: 1px solid var(--color-border-lighter);
+  border-radius: 12px;
+  background: var(--color-bg-highlight);
+}
+
+.worker-card div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.worker-card span,
+.worker-card p,
+.muted,
+.empty-mini {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.worker-card p {
+  margin-top: 6px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  min-width: 760px;
+}
+
+.role-chip,
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-chip {
+  color: #1d4ed8;
+  background: var(--color-primary-light);
+}
+
+.status-chip.active {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.status-chip.disabled {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.btn-text {
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form {
+    grid-template-columns: 1fr;
+  }
 }

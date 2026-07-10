@@ -7,6 +7,7 @@ const DataTable = (() => {
   let currentUser = null;
   let currentPage = 1;
   let totalPages = 1;
+  let selectedIds = new Set();
 
   // 回调
   let onEditCallback = null;
@@ -44,11 +45,12 @@ const DataTable = (() => {
 
     const isReviewer = currentUser && currentUser.role === 'reviewer';
     const isEmployee = currentUser && currentUser.role === 'employee';
+    const isAdmin = currentUser && currentUser.role === 'admin';
     // 译员只看自己的任务，不需要显示受让人；审核员需要看到受让人
     document.getElementById('assigneeHeader').style.display = isEmployee ? 'none' : 'table-cell';
 
     const tbody = document.getElementById('tableBody');
-    const colSpan = isEmployee ? 6 : 7;
+    const colSpan = isEmployee ? 6 : (isAdmin ? 8 : 7);
 
     if (!items || items.length === 0) {
       tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><div class="empty-icon">📭</div><p>暂无匹配的商标数据</p></div></td></tr>`;
@@ -58,25 +60,32 @@ const DataTable = (() => {
         const statusTitle = CONFIG.STATUS_LABEL[item.status] || item.status;
         const isPendingOrRejected = item.status === 'pending' || item.status === 'rejected';
         const isCorrected = item.status === 'corrected';
-        const isHandledByReviewer = isReviewer && item.reviewedBy === currentUser?.username;
+        const assignedToCurrentUser = item.assignedToId
+          ? String(item.assignedToId) === String(currentUser?.id)
+          : item.assignedTo === currentUser?.username;
+        const isHandledByReviewer = isReviewer && (item.reviewedById
+          ? String(item.reviewedById) === String(currentUser?.id)
+          : item.reviewedBy === currentUser?.username);
 
         // 编辑权限：译员只能编辑自己领取的 pending/rejected 任务
         const canEdit = isEmployee && (isPendingOrRejected || isCorrected) &&
-          item.assignedTo === currentUser?.username;
+          assignedToCurrentUser;
 
         // 审核权限：审核员可审核 corrected 状态
         const canReview = isReviewer && isCorrected;
 
-        // 查看权限：审核员只查看待审核和自己处理过的记录；译员只查看自己的
+        // 查看权限：管理员全量；审核员只查看待审核和自己处理过的记录；译员只查看自己的
         const canView = (isReviewer && (isCorrected || isHandledByReviewer)) ||
-          (isEmployee && item.assignedTo === currentUser?.username);
+          (isEmployee && assignedToCurrentUser) || isAdmin;
 
         const correctedDisplay = item.correctedTranslation || '';
         const correctedClass = correctedDisplay ? '' : 'empty';
         const correctedText = correctedDisplay || '未修正';
 
         let actionHtml = '';
-        if (isReviewer) {
+        if (isAdmin) {
+          actionHtml = `<button class="btn-icon edit" data-id="${item.id}" title="查看/修正">📋</button>`;
+        } else if (isReviewer) {
           if (canView) {
             actionHtml = `<button class="btn-icon edit" data-id="${item.id}" title="查看详情">📋</button>`;
           }
@@ -95,10 +104,12 @@ const DataTable = (() => {
         if (!actionHtml) actionHtml = '<span style="color:#cbd5e1;">—</span>';
 
         // 译员隐藏受让人列，审核员显示受让人
+        const selectCell = isAdmin ? `<td><input type="checkbox" class="row-check" data-id="${item.id}" ${selectedIds.has(Number(item.id)) ? 'checked' : ''}></td>` : '';
         const assigneeCell = isEmployee ? '' : `<td>${item.assignedTo ? `<span class="assignee-tag">${escapeHtml(item.assignedTo)}</span>` : `<span class="assignee-tag unassigned">—</span>`}</td>`;
 
         return `
           <tr>
+            ${selectCell}
             <td class="source-text" title="${escapeHtml(item.sourceText)}">${escapeHtml(item.sourceText)}</td>
             <td class="machine-trans" title="${escapeHtml(item.machineTranslation)}">${escapeHtml(item.machineTranslation)}</td>
             <td class="corrected-trans ${correctedClass}" title="${escapeHtml(correctedDisplay)}">${escapeHtml(correctedText)}</td>
@@ -151,6 +162,21 @@ const DataTable = (() => {
     tbody.querySelectorAll('.btn-icon.review').forEach(btn => {
       btn.addEventListener('click', () => { if (onReviewCallback) onReviewCallback(parseInt(btn.dataset.id)); });
     });
+    tbody.querySelectorAll('.row-check').forEach(check => {
+      check.addEventListener('change', () => {
+        const id = Number(check.dataset.id);
+        if (check.checked) selectedIds.add(id);
+        else selectedIds.delete(id);
+      });
+    });
+  }
+
+  function getSelectedIds() {
+    return Array.from(selectedIds);
+  }
+
+  function clearSelected() {
+    selectedIds.clear();
   }
 
   function escapeHtml(str) {
@@ -160,5 +186,5 @@ const DataTable = (() => {
     return div.innerHTML;
   }
 
-  return { init, setUser, getCurrentPage, resetPage, render };
+  return { init, setUser, getCurrentPage, resetPage, render, getSelectedIds, clearSelected };
 })();

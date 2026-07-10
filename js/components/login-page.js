@@ -16,29 +16,24 @@ const LoginPage = (() => {
 
     const container = document.getElementById(containerId);
     container.innerHTML = `
-      <div class="login-card">
-        <div class="logo-area">
-          <div class="logo-icon">™</div>
-          <h1>商标翻译校对</h1>
-          <p class="subtitle">机器翻译 · 人工修正 · 任务领取</p>
-        </div>
-        <form id="loginForm" autocomplete="off">
-          <div class="form-group">
-            <label for="loginUser">用户名</label>
-            <input type="text" id="loginUser" placeholder="请输入用户名" value="employee" />
+      <div class="login-shell">
+        <div class="login-card">
+          <div class="logo-area">
+            <div class="logo-icon">™</div>
+            <h2>商标翻译校对系统</h2>
           </div>
-          <div class="form-group">
-            <label for="loginPass">密码</label>
-            <input type="password" id="loginPass" placeholder="请输入密码" value="123456" />
-          </div>
-          <button type="submit" class="btn-primary">登 录</button>
-          <div class="error-msg" id="loginError"></div>
-        </form>
-        <div class="demo-hint">
-          <strong>👤 演示账号</strong><br />
-          译员：<strong>employee</strong> / 123456 &nbsp;|&nbsp;
-          审核员：<strong>admin</strong> / 123456 &nbsp;|&nbsp;
-          审核员2：<strong>reviewer2</strong> / 123456
+          <form id="loginForm" autocomplete="off">
+            <div class="form-group">
+              <label for="loginUser">用户名</label>
+              <input type="text" id="loginUser" placeholder="用户名" />
+            </div>
+            <div class="form-group">
+              <label for="loginPass">密码</label>
+              <input type="password" id="loginPass" placeholder="密码" />
+            </div>
+            <button type="submit" class="btn-primary">登 录</button>
+            <div class="error-msg" id="loginError"></div>
+          </form>
         </div>
       </div>
     `;
@@ -65,23 +60,6 @@ const LoginPage = (() => {
         errorEl.textContent = '❌ ' + err.message;
       }
     });
-
-    // 演示账号快速填充
-    const demoHint = document.querySelector('.demo-hint');
-    if (demoHint) {
-      demoHint.addEventListener('click', (e) => {
-        const text = e.target.textContent?.trim();
-        if (text && (text.includes('employee') || text.includes('admin'))) {
-          const parts = text.split('/');
-          if (parts.length >= 2) {
-            const user = parts[0].trim();
-            const pass = parts[1].trim().replace(/\|.*$/, '').trim();
-            document.getElementById('loginUser').value = user;
-            document.getElementById('loginPass').value = pass;
-          }
-        }
-      });
-    }
   }
 
   return { render };

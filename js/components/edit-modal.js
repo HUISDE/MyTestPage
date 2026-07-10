@@ -24,15 +24,15 @@ const EditModal = (() => {
       const item = await API.getTrademarkDetail(id);
       if (currentUser && currentUser.role === 'reviewer') { openAsReviewer(item); return; }
 
-      if (item.status === 'reviewed') { Toast.show('已审核的商标不能修改', 'warning'); return; }
-      if (item.assignedTo && item.assignedTo !== currentUser?.username) { Toast.show('该任务已分配给其他员工，无法编辑', 'error'); return; }
+      if (item.status === 'reviewed' && currentUser?.role !== 'admin') { Toast.show('已审核的商标不能修改', 'warning'); return; }
+      if (currentUser?.role !== 'admin' && item.assignedTo && !isAssignedToCurrentUser(item)) { Toast.show('该任务已分配给其他员工，无法编辑', 'error'); return; }
 
       editingId = id;
       populateText('modalSourceText', item.sourceText, true);
       document.getElementById('modalClass').textContent = item.class || '—';
       populateText('modalMachineTrans', item.machineTranslation || '', true);
       document.getElementById('modalCorrectedInput').value = item.correctedTranslation || '';
-      document.getElementById('modalCorrectedInput').disabled = false;
+      document.getElementById('modalCorrectedInput').disabled = item.status === 'reviewed';
 
       const matchBlock = document.getElementById('modalMatchBlock');
       if (item.matchText && item.matchText.trim()) { matchBlock.style.display = 'block'; document.getElementById('modalMatchText').textContent = item.matchText; }
@@ -41,7 +41,7 @@ const EditModal = (() => {
       renderRefsAndLogs(item.references, item.reviewLogs);
 
       document.getElementById('rejectCommentGroup').style.display = 'none';
-      document.getElementById('modalSave').style.display = '';
+      document.getElementById('modalSave').style.display = item.status === 'reviewed' ? 'none' : '';
       document.getElementById('modalSave').textContent = '💾 保存修正';
       document.getElementById('modalCancel').textContent = '取消';
 
@@ -166,7 +166,14 @@ const EditModal = (() => {
       const item = await API.getTrademarkDetail(id);
       if (item.status === 'reviewed') { Toast.show('该条目已审核', 'info'); return; }
       if (!item.correctedTranslation) { Toast.show('请先修正译文再审核', 'warning'); return; }
-      if (!confirm(`确认审核通过 ID=${item.id} 的译文？`)) return;
+      const confirmed = await ConfirmDialog.open({
+        title: '确认审核通过',
+        message: `确认审核通过 ID=${item.id} 的译文？`,
+        confirmText: '确认通过',
+        cancelText: '再看看',
+        variant: 'success'
+      });
+      if (!confirmed) return;
       await API.reviewTrademark(id);
       Toast.show(`🏅 ID=${item.id} 已审核通过`, 'success');
       if (onSavedCallback) onSavedCallback();
@@ -188,6 +195,11 @@ const EditModal = (() => {
   }
 
   function escapeHtml(str) { if (!str) return ''; const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+  function isAssignedToCurrentUser(item) {
+    if (!currentUser) return false;
+    if (item.assignedToId) return String(item.assignedToId) === String(currentUser.id);
+    return item.assignedTo === currentUser.username;
+  }
   function formatTime(isoStr) { if (!isoStr) return ''; try { return new Date(isoStr).toLocaleString('zh-CN'); } catch (_) { return isoStr; } }
 
   return { init, setUser, open, close, save, review };

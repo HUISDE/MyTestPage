@@ -11,6 +11,7 @@
   background: linear-gradient(160deg, #f0f5ff 0%, #e8f0fe 30%, #f5f7fa 60%, #fafbfd 100%);
   position: relative;
   overflow: hidden;
+  padding: 24px;
 }
 
 /* 装饰性背景圆 */
@@ -20,7 +21,7 @@
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
   top: -200px;
   right: -100px;
   pointer-events: none;
@@ -32,10 +33,18 @@
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
   bottom: -150px;
   left: -80px;
   pointer-events: none;
+}
+
+.login-shell {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .login-card {
@@ -43,21 +52,19 @@
   border-radius: 20px;
   padding: 44px 40px;
   width: 100%;
-  max-width: 420px;
   box-shadow:
-    0 4px 6px rgba(0,0,0,0.03),
-    0 10px 30px rgba(59,130,246,0.06),
-    0 24px 70px rgba(59,130,246,0.08);
+    0 4px 6px rgba(0, 0, 0, 0.03),
+    0 10px 30px rgba(59, 130, 246, 0.06),
+    0 24px 70px rgba(59, 130, 246, 0.08);
   position: relative;
-  z-index: 1;
   transition: box-shadow 0.3s ease;
 }
 
 .login-card:hover {
   box-shadow:
-    0 4px 6px rgba(0,0,0,0.04),
-    0 14px 36px rgba(59,130,246,0.08),
-    0 28px 80px rgba(59,130,246,0.12);
+    0 4px 6px rgba(0, 0, 0, 0.04),
+    0 14px 36px rgba(59, 130, 246, 0.08),
+    0 28px 80px rgba(59, 130, 246, 0.12);
 }
 
 /* ---- Logo 区域 ---- */
@@ -77,7 +84,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  box-shadow: 0 8px 28px rgba(59,130,246,0.35);
+  box-shadow: 0 8px 28px rgba(59, 130, 246, 0.35);
   transition: transform 0.2s ease;
 }
 
@@ -85,19 +92,13 @@
   transform: scale(1.05);
 }
 
-.login-card h1 {
+.login-card h2 {
   font-size: 22px;
   font-weight: 700;
   color: #1e293b;
   letter-spacing: -0.3px;
 }
 
-.login-card .subtitle {
-  color: #94a3b8;
-  font-size: 13px;
-  margin-top: 6px;
-  font-weight: 400;
-}
 
 /* ---- 表单 ---- */
 .login-card .form-group {
@@ -136,7 +137,7 @@
 
 .login-card input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
   background: #fff;
 }
 
@@ -161,12 +162,12 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
   pointer-events: none;
 }
 
 .login-card .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(59,130,246,0.35);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
   transform: translateY(-1px);
 }
 
@@ -183,30 +184,6 @@
   font-weight: 500;
 }
 
-/* ---- 演示提示 ---- */
-.login-card .demo-hint {
-  text-align: center;
-  margin-top: 22px;
-  font-size: 12px;
-  color: #94a3b8;
-  background: #f8fafc;
-  padding: 14px 16px;
-  border-radius: 12px;
-  line-height: 1.7;
-  cursor: pointer;
-  user-select: none;
-  border: 1px solid #f1f5f9;
-  transition: background 0.2s;
-}
-
-.login-card .demo-hint:hover {
-  background: #f1f5f9;
-}
-
-.login-card .demo-hint strong {
-  color: #475569;
-  font-weight: 600;
-}
 
 /* ---- 响应式 ---- */
 @media (max-width: 640px) {

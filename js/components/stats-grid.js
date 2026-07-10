@@ -10,11 +10,21 @@ const StatsGrid = (() => {
   function render(stats, role) {
     const empGrid = document.getElementById('statsEmployee');
     const rvGrid = document.getElementById('statsReviewer');
+    const adminGrid = document.getElementById('statsAdmin');
 
-    if (role === 'reviewer') {
+    if (role === 'admin') {
+      if (empGrid) empGrid.style.display = 'none';
+      if (rvGrid) rvGrid.style.display = 'none';
+      if (adminGrid) adminGrid.style.display = 'grid';
+      document.getElementById('adTotal').textContent = stats.total ?? 0;
+      document.getElementById('adClaimable').textContent = stats.claimable ?? stats.pending ?? 0;
+      document.getElementById('adCorrected').textContent = stats.corrected ?? 0;
+      document.getElementById('adReviewed').textContent = stats.reviewed ?? 0;
+    } else if (role === 'reviewer') {
       // 审核员卡片
       if (empGrid) empGrid.style.display = 'none';
       if (rvGrid) rvGrid.style.display = 'grid';
+      if (adminGrid) adminGrid.style.display = 'none';
       document.getElementById('rvToReview').textContent = stats.toReview ?? 0;
       document.getElementById('rvApproved').textContent = stats.approvedByMe ?? 0;
       document.getElementById('rvRejected').textContent = stats.rejectedByMe ?? 0;
@@ -22,6 +32,7 @@ const StatsGrid = (() => {
     } else {
       // 译员卡片
       if (rvGrid) rvGrid.style.display = 'none';
+      if (adminGrid) adminGrid.style.display = 'none';
       if (empGrid) empGrid.style.display = 'grid';
       document.getElementById('statPending').textContent = stats.pending ?? 0;
       document.getElementById('statCorrected').textContent = stats.corrected ?? 0;

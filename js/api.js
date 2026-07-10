@@ -104,6 +104,31 @@ const API = (() => {
 
     async claimTasks(count) {
       return await request('POST', '/tasks/claim', { count });
+    },
+
+    async assignTasks(assigneeId, ids) {
+      return await request('POST', '/tasks/assign', { assigneeId, ids });
+    },
+
+    // === 管理端 ===
+    async getAdminMeta() {
+      return await request('GET', '/admin/meta');
+    },
+
+    async getAdminUsers() {
+      return await request('GET', '/admin/users');
+    },
+
+    async createAdminUser(payload) {
+      return await request('POST', '/admin/users', payload);
+    },
+
+    async updateAdminUser(id, payload) {
+      return await request('PUT', `/admin/users/${id}`, payload);
+    },
+
+    async getWorkerStats() {
+      return await request('GET', '/admin/workers/stats');
     }
   };
 })();

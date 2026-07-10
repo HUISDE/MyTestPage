@@ -16,6 +16,9 @@ const CONFIG = {
   // 用户信息在 sessionStorage 中的存储键名
   USER_KEY: 'trademark_user',
 
+  // 工作区筛选/排序条件在 localStorage 中的存储键名
+  WORKSPACE_FILTER_KEY: 'trademark_workspace_filters',
+
   // 每页显示条数
   PAGE_SIZE: 10,
 

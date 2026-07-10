@@ -34,6 +34,8 @@ const Toolbar = (() => {
     const statusFilter = document.getElementById('statusFilter');
     if (!statusFilter) return;
 
+    const previousValue = statusFilter.value || 'all';
+
     const options = role === 'reviewer'
       ? [
         { value: 'all', label: '全部可审核' },
@@ -50,7 +52,22 @@ const Toolbar = (() => {
       ];
 
     statusFilter.innerHTML = options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-    statusFilter.value = 'all';
+    statusFilter.value = options.some(opt => opt.value === previousValue) ? previousValue : 'all';
+  }
+
+  function setValues(values = {}) {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const sortBy = document.getElementById('sortBy');
+    const sortOrder = document.getElementById('sortOrder');
+
+    if (searchInput && typeof values.search === 'string') searchInput.value = values.search;
+    if (statusFilter && values.status) {
+      const hasStatus = Array.from(statusFilter.options).some(opt => opt.value === values.status);
+      statusFilter.value = hasStatus ? values.status : 'all';
+    }
+    if (sortBy && values.sortBy) sortBy.value = values.sortBy;
+    if (sortOrder && values.sortOrder) sortOrder.value = values.sortOrder;
   }
 
   function bindEvents() {
@@ -123,5 +140,5 @@ const Toolbar = (() => {
     };
   }
 
-  return { init, setUserRole, getSearch, getStatus, getSortParams };
+  return { init, setUserRole, setValues, getSearch, getStatus, getSortParams };
 })();
