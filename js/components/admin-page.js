@@ -78,7 +78,7 @@ const AdminPage = (() => {
         if (!box) return;
         const languages = meta.languages || [];
         box.innerHTML = languages.length
-            ? languages.map(l => `<label><input type="checkbox" name="lanIds" value="${l.id}"> ${escapeHtml(l.lan_name || `${l.source_lang || ''}-${l.target_lang || ''}`)}</label>`).join('')
+            ? languages.map(l => `<label><input type="checkbox" name="lanCodes" value="${escapeHtml(l.lan_code)}"> ${escapeHtml(l.lan_name || `${l.source_lang || ''}-${l.target_lang || ''}`)}</label>`).join('')
             : '<span class="muted">暂无语种限制配置</span>';
     }
 
@@ -131,14 +131,14 @@ const AdminPage = (() => {
             e.preventDefault();
             const form = e.currentTarget;
             const fd = new FormData(form);
-            const lanIds = Array.from(form.querySelectorAll('input[name="lanIds"]:checked')).map(i => Number(i.value));
+            const lanCodes = Array.from(form.querySelectorAll('input[name="lanCodes"]:checked')).map(i => i.value);
             const payload = {
                 username: fd.get('username'),
                 name: fd.get('name'),
                 password: fd.get('password'),
                 role: fd.get('role'),
                 status: fd.get('status'),
-                lanIds
+                lanIds: lanCodes
             };
             try {
                 await API.createAdminUser(payload);
