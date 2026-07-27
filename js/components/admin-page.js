@@ -78,7 +78,7 @@ const AdminPage = (() => {
         if (!box) return;
         const languages = meta.languages || [];
         box.innerHTML = languages.length
-            ? languages.map(l => `<label><input type="checkbox" name="lanCodes" value="${escapeHtml(l.lan_code)}"> ${escapeHtml(l.lan_name || `${l.source_lang || ''}-${l.target_lang || ''}`)}</label>`).join('')
+            ? languages.map(l => `<label><input type="checkbox" name="lanIds" value="${escapeHtml(l.id)}"> ${escapeHtml(l.lan_name || `${l.source_lang || ''}-${l.target_lang || ''}`)}</label>`).join('')
             : '<span class="muted">暂无语种限制配置</span>';
     }
 
@@ -107,7 +107,7 @@ const AdminPage = (() => {
         <td>${escapeHtml(u.name || '')}</td>
         <td><span class="role-chip">${escapeHtml(u.role_name || u.role)}</span></td>
         <td><span class="status-chip ${disabled ? 'disabled' : 'active'}">${disabled ? '停用' : '启用'}</span></td>
-        <td>${escapeHtml(u.languages || '全部语种')}</td>
+        <td>${escapeHtml(u.languages || '未授权')}</td>
         <td><button class="btn-text admin-toggle-status" data-id="${u.id}" data-status="${disabled ? 'active' : 'disabled'}">${disabled ? '启用' : '停用'}</button></td>
       </tr>`;
         }).join('');
@@ -131,14 +131,14 @@ const AdminPage = (() => {
             e.preventDefault();
             const form = e.currentTarget;
             const fd = new FormData(form);
-            const lanCodes = Array.from(form.querySelectorAll('input[name="lanCodes"]:checked')).map(i => i.value);
+            const lanIds = [...form.querySelectorAll('input[name="lanIds"]:checked')].map(input => Number(input.value));
             const payload = {
                 username: fd.get('username'),
                 name: fd.get('name'),
                 password: fd.get('password'),
                 role: fd.get('role'),
                 status: fd.get('status'),
-                lanIds: lanCodes
+                lanIds
             };
             try {
                 await API.createAdminUser(payload);

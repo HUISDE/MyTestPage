@@ -47,9 +47,9 @@ backend/                            # 后端项目
 │       ├── auth.js                 # 登录/登出/用户信息
 │       ├── trademarks.js           # 商标CRUD + 审核/驳回
 │       └── tasks.js                # 任务领取
-├── migrate_reviewer.js             # 数据库迁移脚本 (reviewer角色)
-├── reset_db.js                     # 数据库重置脚本
-└── verify_db.js                    # 数据库验证脚本
+├── migrate_to_trademark.js         # 正式迁移脚本（默认只读预检）
+├── verify_trademark_migration.js   # 目标库完整性验证
+└── test_migrated_workflows.js      # 临时隔离库写流程测试
 ```
 
 ## 数据库表结构
@@ -59,31 +59,45 @@ backend/                            # 后端项目
 |------|------|------|
 | id | INT PK AUTO | 主键 |
 | task_id | INT | 批次/件ID（预留） |
-| class | VARCHAR | 领域类型 (科技电子/商业服务等) |
+| class | INT | NCL 分类 ID，关联 `class_table.id` |
+| legacy_class | VARCHAR | 迁移前分类原值 |
+| lan | INT | 语种 ID，关联 `lan_table.id` |
 | source_text | TEXT | 原文 |
 | machine_translation | TEXT | 机器翻译译文 |
-| match_text | TEXT | 高度匹配结果（可空） |
+| matched_translation | TEXT | 高度匹配结果（可空） |
 | corrected_translation | TEXT | 人工修正译文 |
-| status | ENUM(pending,corrected,reviewed,rejected) | 状态 |
+| status | ENUM(pending,corrected,reviewed,rejected,completed) | 工作流状态 |
 | assigned_to | VARCHAR(50) | 受让人 |
 | corrected_by | VARCHAR(50) | 修正人 |
 | reviewed_by | VARCHAR(50) | 审核人 |
-| *_at | TIMESTAMP | 各操作时间戳 |
+| *_at | DATETIME | 各操作时间戳 |
 
-### `translation_references` (翻译参考)
+### `match_dict` (翻译参考)
 | 字段 | 说明 |
 |------|------|
-| id, class, trademark_id, src, dest | 参考译文条目 |
+| id, class, trademark_id, src, dest | 目标库既有参考译文条目 |
 
 ### `review_logs` (审核记录)
 | 字段 | 说明 |
 |------|------|
-| id, trademark_id, reviewer_username, action(approved/rejected), comment, created_at | 审核日志 |
+| id, trademark_id, reviewer_id, action(approved/rejected), comment, created_at | 规范化审核日志 |
+
+### `operation_logs` (操作记录)
+| 字段 | 说明 |
+|------|------|
+| id, operator_id, action, target_type, target_id, detail, created_at | 领取、分配、修正、审核和用户管理日志 |
 
 ### `users` (用户)
 | 字段 | 说明 |
 |------|------|
-| id, username, password, name, role(admin/employee/reviewer), created_by | 用户信息 |
+| id, username, password, name, role, role_id, status, created_by, created_at, updated_at | 用户信息；不使用旧 `user_table` |
+
+### RBAC 与语种
+
+- `roles`、`permissions`、`role_permissions` 保存角色权限关系。
+- `lan_table` 只使用整数主键：1 中文、2 英文、3 法文、4 西班牙文，不使用 `lan_code`。
+- `user_lans(user_id, lan_id, proficiency)` 保存用户语种授权。
+- 非管理员没有语种授权时不可查看或领取任务；管理员不受语种过滤。
 
 ## 状态流转
 
@@ -96,15 +110,14 @@ pending (导入) → 译员领取 → pending (已分配)
 
 ## 角色权限
 
-| 功能 | 译员(employee) | 审核员(reviewer) |
-|------|:---:|:---:|
-| 可见数据 | 分配给自己 | 全部（pending除外） |
-| 任务领取 | ✅ | ❌ |
-| 修正译文 | ✅ | ❌ |
-| 查看详情 | ✅ | ✅ |
-| 审核通过 | ❌ | ✅ |
-| 驳回+意见 | ❌ | ✅ |
-| 统计数据 | 个人任务状态 | 全局待审核/个人通过/驳回 |
+| 功能 | 管理员(admin) | 译员(employee) | 审核员(reviewer) |
+|------|:---:|:---:|:---:|
+| 可见数据 | 全量 | 本人任务+授权语种 | 待审核/驳回任务+授权语种 |
+| 任务领取 | ❌ | ✅ | ❌ |
+| 任务分配 | ✅ | ❌ | ❌ |
+| 修正译文 | ❌ | ✅ | ❌ |
+| 审核通过/驳回 | ❌ | ❌ | ✅ |
+| 用户管理 | ✅ | ❌ | ❌ |
 
 ## API 接口
 
@@ -124,6 +137,13 @@ pending (导入) → 译员领取 → pending (已分配)
 ### 任务领取
 - `GET /api/tasks/claimable-count` - 可领取任务数
 - `POST /api/tasks/claim` - 领取任务
+- `POST /api/tasks/assign` - 管理员分配任务
+
+### 管理端
+- `GET /api/admin/meta` - 角色、权限和语种元数据
+- `GET /api/admin/users` - 用户列表
+- `POST /api/admin/users` - 创建用户
+- `PUT /api/admin/users/:id` - 更新用户
 
 ## 部署说明
 
@@ -138,15 +158,27 @@ python -m http.server 8080
 ```bash
 cd backend
 npm install
-node src/app.js   # 默认端口 3000
+npm start         # 默认端口 3000，默认数据库 trademark
 ```
+
+### 数据库迁移与验证
+
+```bash
+cd backend
+npm run migrate:dry-run          # 只读预检
+npm run migrate:verify           # 正式库完整性验证
+npm run test:migrated-workflows  # 临时隔离库完整写流程测试
+```
+
+迁移实施和恢复锚点见 `backend/trademark_schema_migration_report.md`。`migrate:apply` 会写数据库，目标库已完成迁移，未经审批不要重复执行。
 
 ### 演示账号
 | 角色 | 用户名 | 密码 |
 |------|--------|------|
+| 管理员 | admin | 123456 |
 | 译员 | employee | 123456 |
-| 审核员 | admin (李主管) | 123456 |
-| 审核员2 | reviewer2 (王审核) | 123456 |
+| 审核员 | reviewer | 123456 |
+| 审核员2 | reviewer2 | 123456 |
 
 ## 前端架构说明
 
