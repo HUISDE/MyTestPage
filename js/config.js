@@ -8,7 +8,7 @@
  */
 const CONFIG = {
   // API 接口基地址（部署时修改此项）
-  API_BASE_URL: 'https://frp-way.com:52477/api',
+  API_BASE_URL: 'https://frp-fun.com:11302/api',
 
   // Token 在 localStorage 中的存储键名
   TOKEN_KEY: 'trademark_token',
